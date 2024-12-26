@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/Footer";
+import { ToastContainer } from "react-toastify";
 
+import { connectToMongoDB } from "./lib/connectDB";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -28,7 +32,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Navbar />
+        <ToastContainer theme="colored" position="top-center" />
+
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );
