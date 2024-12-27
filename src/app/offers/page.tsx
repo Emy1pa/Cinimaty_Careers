@@ -1,7 +1,7 @@
-import React from "react";
+import Offers from "./jobOffers/page";
 
 const OffersPage = () => {
-  return <div>Offers Page</div>;
+  return <Offers />;
 };
 
 export default OffersPage;
