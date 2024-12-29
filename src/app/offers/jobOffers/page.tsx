@@ -11,19 +11,36 @@ import {
 } from "lucide-react";
 import { JobOffer } from "@/app/utils/interfaces";
 import Link from "next/link";
+import { Pagination } from "@/components/Pagination";
+import { useSearchParams } from "next/navigation";
 
 interface ApiResponse {
   data: JobOffer[];
 }
-
+const ITEMS_PER_PAGE = 8;
 const Offers = () => {
   const [offers, setOffers] = useState<JobOffer[]>([]);
-  const [filteredOffers, setFilteredOffers] = useState<JobOffer[]>([]);
+  // const [filteredOffers, setFilteredOffers] = useState<JobOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedJobType, setSelectedJobType] = useState("");
+  const filteredOffers = offers.filter((offer) => {
+    const titleMatch = offer.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const locationMatch =
+      !selectedLocation || offer.location === selectedLocation;
+    const jobTypeMatch = !selectedJobType || offer.jobType === selectedJobType;
+    return titleMatch && locationMatch && jobTypeMatch;
+  });
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("pageNumber")) || 1;
+  const totalPages = Math.ceil(filteredOffers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const visibleOffers = filteredOffers.slice(startIndex, endIndex);
   useEffect(() => {
     const fetchOffers = async () => {
       try {
@@ -36,7 +53,7 @@ const Offers = () => {
           ? responseData
           : responseData.data;
         setOffers(data);
-        setFilteredOffers(data);
+        // setFilteredOffers(data);
         setLoading(false);
       } catch (error) {
         setError(error instanceof Error ? error.message : "an error occured");
@@ -50,18 +67,18 @@ const Offers = () => {
     ...new Set(offers.map((offer) => offer.jobType).filter(Boolean)),
   ];
   useEffect(() => {
-    let results = offers;
-    results = results.filter((offer) => {
-      const titleMatch = offer.title
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const locationMatch =
-        selectedLocation === "" || offer.location === selectedLocation;
-      const jobTypeMatch =
-        selectedJobType === "" || offer.jobType === selectedJobType;
-      return titleMatch && locationMatch && jobTypeMatch;
-    });
-    setFilteredOffers(results);
+    // let results = offers;
+    // results = results.filter((offer) => {
+    //   const titleMatch = offer.title
+    //     .toLowerCase()
+    //     .includes(searchTerm.toLowerCase());
+    //   const locationMatch =
+    //     selectedLocation === "" || offer.location === selectedLocation;
+    //   const jobTypeMatch =
+    //     selectedJobType === "" || offer.jobType === selectedJobType;
+    //   return titleMatch && locationMatch && jobTypeMatch;
+    // });
+    // setFilteredOffers(results);
   }, [searchTerm, selectedLocation, selectedJobType, offers]);
 
   const parseSkills = (skilsString: string | undefined): string[] => {
@@ -155,7 +172,7 @@ const Offers = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredOffers.length > 0 ? (
-            filteredOffers.map((offer: JobOffer) => (
+            visibleOffers.map((offer: JobOffer) => (
               <div
                 key={offer.id}
                 className="group bg-white/80 backdrop-blur-lg rounded-3xl p-6 shadow-lg hover:shadow-xl 
@@ -226,6 +243,13 @@ const Offers = () => {
             </div>
           )}
         </div>
+        {filteredOffers.length > ITEMS_PER_PAGE && (
+          <Pagination
+            pageNumber={currentPage}
+            pages={totalPages}
+            route="/offers"
+          />
+        )}
       </div>
     </div>
   );
