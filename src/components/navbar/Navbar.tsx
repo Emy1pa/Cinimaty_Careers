@@ -153,13 +153,15 @@ const Navbar = () => {
               </div>
             )}
             {isLoggedIn && (
-              <Link
-                href="/"
-                className="w-full text-center px-4 py-3 bg-red-600 text-white rounded-lg 
+              <Link href="/">
+                <button
+                  className="w-full text-center px-4 py-3 bg-red-600 text-white rounded-lg 
                           font-medium shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.35)]
                           hover:bg-red-700 transition-all duration-300"
-              >
-                <button onClick={handleLogout}>Logout</button>
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
               </Link>
             )}
           </div>

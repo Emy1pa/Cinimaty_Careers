@@ -1,6 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Briefcase, DollarSign, Code, ArrowRight } from "lucide-react";
+import {
+  Briefcase,
+  DollarSign,
+  Code,
+  ArrowRight,
+  Search,
+  MapPin,
+  BadgeCheck,
+} from "lucide-react";
 import { JobOffer } from "@/app/utils/interfaces";
 import Link from "next/link";
 
@@ -10,8 +18,12 @@ interface ApiResponse {
 
 const Offers = () => {
   const [offers, setOffers] = useState<JobOffer[]>([]);
+  const [filteredOffers, setFilteredOffers] = useState<JobOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedJobType, setSelectedJobType] = useState("");
   useEffect(() => {
     const fetchOffers = async () => {
       try {
@@ -20,9 +32,11 @@ const Offers = () => {
           throw new Error("Failed to fetch offers");
         }
         const responseData: ApiResponse = await response.json();
-        setOffers(
-          Array.isArray(responseData) ? responseData : responseData.data
-        );
+        const data = Array.isArray(responseData)
+          ? responseData
+          : responseData.data;
+        setOffers(data);
+        setFilteredOffers(data);
         setLoading(false);
       } catch (error) {
         setError(error instanceof Error ? error.message : "an error occured");
@@ -31,6 +45,25 @@ const Offers = () => {
     };
     fetchOffers();
   }, []);
+  const locations = [...new Set(offers.map((offer) => offer.location))];
+  const jobTypes = [
+    ...new Set(offers.map((offer) => offer.jobType).filter(Boolean)),
+  ];
+  useEffect(() => {
+    let results = offers;
+    results = results.filter((offer) => {
+      const titleMatch = offer.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const locationMatch =
+        selectedLocation === "" || offer.location === selectedLocation;
+      const jobTypeMatch =
+        selectedJobType === "" || offer.jobType === selectedJobType;
+      return titleMatch && locationMatch && jobTypeMatch;
+    });
+    setFilteredOffers(results);
+  }, [searchTerm, selectedLocation, selectedJobType, offers]);
+
   const parseSkills = (skilsString: string | undefined): string[] => {
     if (!skilsString) return [];
     try {
@@ -69,11 +102,60 @@ const Offers = () => {
           <p className="text-xl text-gray-600">
             Discover your next career opportunity
           </p>
+          <div className="max-w-4xl mx-auto space-y-4">
+            <div className="relative">
+              <Search className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search job titles..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-purple-100 focus:border-purple-300 
+                         focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all"
+              />
+            </div>
+
+            <div className="flex gap-4 flex-wrap justify-center">
+              <div className="relative inline-block">
+                <MapPin className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="pl-12 pr-8 py-3 rounded-xl border border-purple-100 focus:border-purple-300 
+                           focus:ring-2 focus:ring-purple-200 focus:outline-none appearance-none bg-white"
+                >
+                  <option value="">All Locations</option>
+                  {locations.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative inline-block">
+                <BadgeCheck className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                <select
+                  value={selectedJobType}
+                  onChange={(e) => setSelectedJobType(e.target.value)}
+                  className="pl-12 pr-8 py-3 rounded-xl border border-purple-100 focus:border-purple-300 
+                           focus:ring-2 focus:ring-purple-200 focus:outline-none appearance-none bg-white"
+                >
+                  <option value="">All Job Types</option>
+                  {jobTypes.map((jobType) => (
+                    <option key={jobType} value={jobType}>
+                      {jobType}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {offers.length > 0 ? (
-            offers.map((offer: JobOffer) => (
+          {filteredOffers.length > 0 ? (
+            filteredOffers.map((offer: JobOffer) => (
               <div
                 key={offer.id}
                 className="group bg-white/80 backdrop-blur-lg rounded-3xl p-6 shadow-lg hover:shadow-xl 
