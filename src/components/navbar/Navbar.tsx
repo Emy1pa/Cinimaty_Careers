@@ -1,11 +1,44 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X, Briefcase } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/auth/check", {
+        credentials: "include",
+      });
+      const data = await response.json();
+      setIsLoggedIn(!!(token && data.isAuthenticated));
+    };
 
+    window.addEventListener("storage", checkToken);
+    checkToken();
+
+    return () => window.removeEventListener("storage", checkToken);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        localStorage.removeItem("token");
+        setIsLoggedIn(false);
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   const navItems = [
     { label: "Find Jobs", href: "/offers" },
     { label: "Companies", href: "/companies" },
@@ -37,24 +70,37 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
-            <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-purple-100">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-purple-600 font-medium hover:text-purple-700 hover:bg-purple-50/70 rounded-lg transition-all duration-300"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium 
+            {!isLoggedIn && (
+              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-purple-100">
+                <Link
+                  href="/login"
+                  className="px-4 py-2 text-purple-600 font-medium hover:text-purple-700 hover:bg-purple-50/70 rounded-lg transition-all duration-300"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium 
                           shadow-[0_4px_12px_rgba(147,51,234,0.25)] 
                           hover:shadow-[0_6px_20px_rgba(147,51,234,0.35)] 
                           hover:bg-purple-700 transition-all duration-300 
                           active:scale-95"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
+            {isLoggedIn && (
+              <Link
+                href="/"
+                className="px-6 py-2 bg-red-600 text-white rounded-lg font-medium 
+                          shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.35)]
+                          hover:bg-red-700 transition-all duration-300 
+                          active:scale-95"
               >
-                Sign up
+                <button onClick={handleLogout}>Logout</button>
               </Link>
-            </div>
+            )}
           </div>
 
           <div className="md:hidden flex items-center">
@@ -85,25 +131,37 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
-            <div className="grid gap-2 pt-4 mt-4 border-t border-purple-50">
-              <Link
-                href="/login"
-                className="w-full text-center px-4 py-3 text-purple-600 font-medium 
+            {!isLoggedIn && (
+              <div className="grid gap-2 pt-4 mt-4 border-t border-purple-50">
+                <Link
+                  href="/login"
+                  className="w-full text-center px-4 py-3 text-purple-600 font-medium 
                           hover:text-purple-700 hover:bg-purple-50/70 rounded-lg 
                           transition-all duration-300"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="w-full text-center px-4 py-3 bg-purple-600 text-white rounded-lg 
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="w-full text-center px-4 py-3 bg-purple-600 text-white rounded-lg 
                           font-medium shadow-[0_4px_12px_rgba(147,51,234,0.25)] 
                           hover:shadow-[0_6px_20px_rgba(147,51,234,0.35)] 
                           hover:bg-purple-700 transition-all duration-300"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
+            {isLoggedIn && (
+              <Link
+                href="/"
+                className="w-full text-center px-4 py-3 bg-red-600 text-white rounded-lg 
+                          font-medium shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:shadow-[0_6px_20px_rgba(220,38,38,0.35)]
+                          hover:bg-red-700 transition-all duration-300"
               >
-                Sign up
+                <button onClick={handleLogout}>Logout</button>
               </Link>
-            </div>
+            )}
           </div>
         </div>
       )}
