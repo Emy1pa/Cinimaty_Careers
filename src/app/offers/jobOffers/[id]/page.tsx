@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Briefcase,
   DollarSign,
   MapPin,
   Clock,
@@ -8,10 +7,20 @@ import {
   Code,
   Send,
   ArrowLeft,
+  LogIn,
 } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import AuthActionButton from "@/components/AuthActionButton";
+async function getAuthStatus() {
+  const cookieStore = cookies();
+  const cookie = cookieStore.get("jwtToken");
 
+  return !!cookie;
+}
 const OfferDetails = async ({ params }: { params: { id: string } }) => {
+  const isAuthenticated = await getAuthStatus();
+
   const response = await fetch(
     `http://localhost:5000/job-offers/${params.id}`,
     {
@@ -20,6 +29,7 @@ const OfferDetails = async ({ params }: { params: { id: string } }) => {
       },
     }
   );
+
   if (!response.ok) {
     throw new Error("Failed to fetch offer");
   }
@@ -111,15 +121,7 @@ const OfferDetails = async ({ params }: { params: { id: string } }) => {
 
           <div className="md:col-span-1">
             <div className="sticky top-8 space-y-4">
-              <button
-                className="w-full py-4 px-6 rounded-xl bg-purple-600 
-                               text-white font-semibold text-lg shadow-lg
-                               hover:bg-purple-700 transform hover:-translate-y-0.5 
-                               transition-all duration-200 flex items-center justify-center"
-              >
-                <Send className="mr-2 h-5 w-5" />
-                Apply Now
-              </button>
+              <AuthActionButton />
               <Link href={"/offers"}>
                 <button
                   className="mt-4 w-full py-4 px-6 rounded-xl border-2 border-purple-600
