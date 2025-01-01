@@ -23,3 +23,16 @@ export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
+export const applicationSchema = z.object({
+  fullName: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  cv: z
+    .instanceof(File, { message: "Cv is required" })
+    .refine((file) => file.size <= 5000000, "File size should be less than 5MB")
+    .refine(
+      (file) => ["application/pdf"].includes(file.type),
+      "Only PDF are allowed"
+    ),
+  offerId: z.string().nonempty("Offer ID is required"),
+});

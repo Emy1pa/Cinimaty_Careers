@@ -3,6 +3,7 @@ import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 import { registerSchema } from "@/app/lib/validation";
 import { connectToMongoDB } from "@/app/lib/connectDB";
+import { RegisterUserDto } from "@/app/utils/dtos";
 export const POST = async (req: NextRequest) => {
   if (req.method !== "POST") {
     return NextResponse.json(

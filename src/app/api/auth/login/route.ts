@@ -5,6 +5,7 @@ import { loginSchema } from "@/app/lib/validation";
 import { JWTPayload } from "@/app/utils/types";
 import { generateJWT, setCookie } from "@/app/utils/generateToken";
 import { connectToMongoDB } from "@/app/lib/connectDB";
+import { LoginUserDto } from "@/app/utils/dtos";
 export const POST = async (req: NextRequest) => {
   if (req.method !== "POST") {
     return NextResponse.json(
