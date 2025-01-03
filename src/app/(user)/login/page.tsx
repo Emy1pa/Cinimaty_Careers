@@ -9,6 +9,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { loginSchema } from "@/app/lib/validation";
+import { jwtDecode } from "jwt-decode";
+interface DecodedToken {
+  id: string;
+  isAdmin: boolean;
+  exp: number;
+  [key: string]: any;
+}
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
@@ -30,8 +37,17 @@ const Login = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
+
       if (response.ok) {
-        localStorage.setItem("token", result.token);
+        const token = result.token;
+        console.log("token", token);
+        localStorage.setItem("token", token);
+        const decoded: DecodedToken = jwtDecode(token);
+        console.log(decoded);
+        console.log(decoded.id);
+
+        localStorage.setItem("userId", decoded.id.toString());
+
         window.dispatchEvent(new Event("storage"));
 
         toast.success("Login successful");

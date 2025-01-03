@@ -2,22 +2,19 @@
 import React, { useEffect, useState } from "react";
 import { Send, LogIn } from "lucide-react";
 import Link from "next/link";
-import ApplicationForm from "@/app/offers/jobOffers/[id]/apply/page";
+import ApplicationForm from "./apply/page";
 interface AuthActionProps {
   offerId: string;
+  jobTitle: string;
 }
-const AuthActionButton = ({ offerId }: AuthActionProps) => {
+const AuthActionButton = ({ offerId, jobTitle }: AuthActionProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
 
   useEffect(() => {
     const checkToken = async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch("/api/auth/check", {
-        credentials: "include",
-      });
-      const data = await response.json();
-      setIsLoggedIn(!!(token && data.isAuthenticated));
+      setIsLoggedIn(!!token);
     };
 
     window.addEventListener("storage", checkToken);
@@ -41,6 +38,7 @@ const AuthActionButton = ({ offerId }: AuthActionProps) => {
         </button>
         {showApplicationModal && (
           <ApplicationForm
+            jobTitle={jobTitle}
             offerId={offerId}
             onClose={() => setShowApplicationModal(false)}
           />

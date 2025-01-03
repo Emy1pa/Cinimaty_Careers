@@ -11,11 +11,7 @@ const Navbar = () => {
   useEffect(() => {
     const checkToken = async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch("/api/auth/check", {
-        credentials: "include",
-      });
-      const data = await response.json();
-      setIsLoggedIn(!!(token && data.isAuthenticated));
+      setIsLoggedIn(!!token);
     };
 
     window.addEventListener("storage", checkToken);
@@ -26,15 +22,9 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        localStorage.removeItem("token");
-        setIsLoggedIn(false);
-        router.push("/");
-      }
+      localStorage.removeItem("token");
+      setIsLoggedIn(false);
+      router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -42,7 +32,7 @@ const Navbar = () => {
   const navItems = [
     { label: "Find Jobs", href: "/offers" },
     { label: "Companies", href: "/companies" },
-    { label: "Post a Job", href: "/post-job" },
+    { label: "My Applications", href: "/applications" },
   ];
 
   return (

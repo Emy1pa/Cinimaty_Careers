@@ -3,15 +3,13 @@ import { DollarSign, MapPin, Clock, Star, Code, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import AuthActionButton from "@/app/offers/jobOffers/[id]/AuthActionButton";
-async function getAuthStatus() {
-  const cookieStore = cookies();
-  const cookie = cookieStore.get("jwtToken");
+// async function getAuthStatus() {
+//   const cookieStore = cookies();
+//   const cookie = cookieStore.get("jwtToken");
 
-  return !!cookie;
-}
+//   return !!cookie;
+// }
 const OfferDetails = async ({ params }: { params: { id: string } }) => {
-  const isAuthenticated = await getAuthStatus();
-
   const response = await fetch(
     `http://localhost:5000/job-offers/${params.id}`,
     {
@@ -112,7 +110,7 @@ const OfferDetails = async ({ params }: { params: { id: string } }) => {
 
           <div className="md:col-span-1">
             <div className="sticky top-8 space-y-4">
-              <AuthActionButton offerId={params.id} />
+              <AuthActionButton offerId={params.id} jobTitle={offer.title} />
               <Link href={"/offers"}>
                 <button
                   className="mt-4 w-full py-4 px-6 rounded-xl border-2 border-purple-600
