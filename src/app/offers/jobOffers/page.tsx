@@ -14,14 +14,11 @@ import Link from "next/link";
 import { Pagination } from "@/components/Pagination";
 import { useSearchParams } from "next/navigation";
 
-interface ApiResponse {
-  data: JobOffer[];
-}
 const ITEMS_PER_PAGE = 8;
-const Offers = () => {
-  const [offers, setOffers] = useState<JobOffer[]>([]);
+const Offers = ({ data }: { data: JobOffer[] }) => {
+  const [offers, setOffers] = useState<JobOffer[]>(data);
   // const [filteredOffers, setFilteredOffers] = useState<JobOffer[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -41,27 +38,7 @@ const Offers = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const visibleOffers = filteredOffers.slice(startIndex, endIndex);
-  useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/job-offers/");
-        if (!response.ok) {
-          throw new Error("Failed to fetch offers");
-        }
-        const responseData: ApiResponse = await response.json();
-        const data = Array.isArray(responseData)
-          ? responseData
-          : responseData.data;
-        setOffers(data);
-        // setFilteredOffers(data);
-        setLoading(false);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "an error occured");
-        setLoading(false);
-      }
-    };
-    fetchOffers();
-  }, []);
+
   const locations = [...new Set(offers.map((offer) => offer.location))];
   const jobTypes = [
     ...new Set(offers.map((offer) => offer.jobType).filter(Boolean)),

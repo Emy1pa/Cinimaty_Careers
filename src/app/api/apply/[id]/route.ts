@@ -23,12 +23,23 @@ export const POST = async (
       );
     }
     const formData = await req.formData();
+    const jobTitle = formData.get("jobTitle");
+
+    if (!jobTitle) {
+      return NextResponse.json(
+        { message: "Job title is required" },
+        { status: 400 }
+      );
+    }
+
     const application = {
       fullName: formData.get("fullName"),
       email: formData.get("email"),
       message: formData.get("message"),
       cv: formData.get("cv") as File,
       offerId,
+      userId: formData.get("userId"),
+      jobTitle: formData.get("jobTitle"),
     };
 
     const validation = applicationSchema.safeParse(application);
@@ -43,7 +54,7 @@ export const POST = async (
     const newApplication = await Application.create({
       ...application,
       cvUrl,
-      status: "pending",
+      status: "Pending",
     });
 
     return NextResponse.json(

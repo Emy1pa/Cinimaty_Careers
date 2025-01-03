@@ -3,7 +3,7 @@ import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/app/lib/validation";
 import { JWTPayload } from "@/app/utils/types";
-import { generateJWT, setCookie } from "@/app/utils/generateToken";
+import { generateJWT } from "@/app/utils/generateToken";
 import { connectToMongoDB } from "@/app/lib/connectDB";
 import { LoginUserDto } from "@/app/utils/dtos";
 export const POST = async (req: NextRequest) => {
@@ -35,22 +35,22 @@ export const POST = async (req: NextRequest) => {
         { message: "Invalid email or password" },
         { status: 400 }
       );
-    // const jwtPayload: JWTPayload = {
-    //   id: user._id,
-    //   isAdmin: user.isAdmin,
-    // };
-    // const token = generateJWT(jwtPayload);
-    const cookie = setCookie({
+    const jwtPayload: JWTPayload = {
       id: user._id,
       isAdmin: user.isAdmin,
-    });
-    const { password, ...userWithoutPassword } = user._doc;
+    };
+    const token = generateJWT(jwtPayload);
+    // const cookie = setCookie({
+    //   id: user._id,
+    //   isAdmin: user.isAdmin,
+    // });
+    // const { password, ...userWithoutPassword } = user._doc;
     return NextResponse.json(
       {
         message: "Authentication successful",
-        user: userWithoutPassword,
+        token,
       },
-      { status: 200, headers: { "Set-Cookie": cookie } }
+      { status: 200 }
     );
   } catch (error) {
     console.log(error);

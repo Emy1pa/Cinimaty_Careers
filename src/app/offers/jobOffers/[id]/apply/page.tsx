@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 interface ApplicationFormProps {
   offerId: string;
+  jobTitle: string;
   onClose: () => void;
 }
 
@@ -17,7 +18,11 @@ interface FormData {
   cv: FileList;
 }
 
-const ApplicationForm = ({ offerId, onClose }: ApplicationFormProps) => {
+const ApplicationForm = ({
+  offerId,
+  jobTitle,
+  onClose,
+}: ApplicationFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -30,7 +35,12 @@ const ApplicationForm = ({ offerId, onClose }: ApplicationFormProps) => {
   const onSubmit = async (data: FormData) => {
     if (!offerId) {
       alert("Offer ID is missing or invalid");
-      return; // Prevent form submission if offerId is invalid
+      return;
+    }
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("User ID is missing. Please log in again.");
+      return;
     }
     setIsSubmitting(true);
     console.log("Form data:", data);
@@ -42,6 +52,8 @@ const ApplicationForm = ({ offerId, onClose }: ApplicationFormProps) => {
       formData.append("email", data.email);
       formData.append("message", data.message);
       formData.append("offerId", offerId);
+      formData.append("userId", userId);
+      formData.append("jobTitle", jobTitle);
       if (data.cv && data.cv[0]) {
         formData.append("cv", data.cv[0]);
       } else {
