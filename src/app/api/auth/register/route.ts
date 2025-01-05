@@ -4,6 +4,72 @@ import bcrypt from "bcryptjs";
 import { registerSchema } from "@/app/lib/validation";
 import { connectToMongoDB } from "@/app/lib/connectDB";
 import { RegisterUserDto } from "@/app/utils/dtos";
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Registers a new user by creating an account with their details.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 description: Full name of the user.
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email address of the user.
+ *               password:
+ *                 type: string
+ *                 description: Password for the user account.
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Phone number of the user.
+ *               address:
+ *                 type: string
+ *                 description: Address of the user.
+ *             required:
+ *               - fullName
+ *               - email
+ *               - password
+ *               - phoneNumber
+ *               - address
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User created successfully
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     fullName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *                     address:
+ *                       type: string
+ *       400:
+ *         description: Invalid input or user already exists
+ *       405:
+ *         description: Method Not Allowed
+ *       500:
+ *         description: Internal server error
+ */
 export const POST = async (req: NextRequest) => {
   if (req.method !== "POST") {
     return NextResponse.json(
