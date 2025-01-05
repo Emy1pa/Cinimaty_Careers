@@ -6,6 +6,52 @@ import { JWTPayload } from "@/app/utils/types";
 import { generateJWT } from "@/app/utils/generateToken";
 import { connectToMongoDB } from "@/app/lib/connectDB";
 import { LoginUserDto } from "@/app/utils/dtos";
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Allows a user to login with their email and password.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: User's email address.
+ *               password:
+ *                 type: string
+ *                 description: User's password.
+ *             required:
+ *               - email
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Authentication successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Authentication successful
+ *                 token:
+ *                   type: string
+ *                   description: JWT authentication token
+ *       400:
+ *         description: Invalid email or password
+ *       405:
+ *         description: Method Not Allowed
+ *       500:
+ *         description: Internal server error
+ */
 export const POST = async (req: NextRequest) => {
   if (req.method !== "POST") {
     return NextResponse.json(

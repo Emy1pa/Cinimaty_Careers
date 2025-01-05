@@ -8,6 +8,50 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  /**
+   * @swagger
+   * /api/applications/{id}:  # Added leading slash
+   *   get:
+   *     summary: Get applications by user ID
+   *     description: Retrieves all applications for a given user, based on the user's ID.
+   *     tags:
+   *       - Applications
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: User ID
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: Successful response
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 applications:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       _id:
+   *                         type: string
+   *                       userId:
+   *                         type: string
+   *                       status:
+   *                         type: string
+   *                         enum: [Pending, Accepted, Rejected]
+   *       401:
+   *         description: Unauthorized
+   *       403:
+   *         description: Forbidden
+   *       500:
+   *         description: Internal server error
+   */
   if (req.method !== "GET") {
     return NextResponse.json(
       { message: "Method not allowed" },
@@ -61,6 +105,57 @@ export async function GET(
     );
   }
 }
+/**
+ * @swagger
+ * /api/applications/{id}:
+ *   patch:
+ *     summary: Update application status
+ *     description: Update the status of a specific application.
+ *     tags:
+ *       - Applications
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Application ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 description: The new status of the application.
+ *                 enum: [Pending, Accepted, Rejected]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Application status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 application:
+ *                   type: object
+ *       400:
+ *         description: Bad Request - Invalid status or missing status
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Application not found
+ *       500:
+ *         description: Internal server error
+ */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }

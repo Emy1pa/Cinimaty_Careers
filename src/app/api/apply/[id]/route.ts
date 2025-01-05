@@ -3,6 +3,72 @@ import { applicationSchema } from "@/app/lib/validation";
 import Application from "@/app/models/Application";
 import { NextRequest, NextResponse } from "next/server";
 import { uploadToCloudinary } from "@/app/lib/cloudinary";
+/**
+ * @swagger
+ * /api/apply/{id}/:
+ *   post:
+ *     summary: Submit a job application
+ *     description: Allows users to submit a job application by providing their details and uploading a CV.
+ *     tags:
+ *       - Applications
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the job offer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 description: Full name of the applicant
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 description: Email address of the applicant
+ *                 example: johndoe@example.com
+ *               message:
+ *                 type: string
+ *                 description: A message or cover letter from the applicant
+ *                 example: I am excited about this opportunity.
+ *               cv:
+ *                 type: string
+ *                 format: binary
+ *                 description: The applicant's CV file
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user submitting the application
+ *                 example: 12345
+ *               jobTitle:
+ *                 type: string
+ *                 description: The title of the job the user is applying for
+ *                 example: Software Developer
+ *     responses:
+ *       201:
+ *         description: Application submitted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Application submitted successfully
+ *                 application:
+ *                   type: object
+ *       400:
+ *         description: Bad request (e.g., missing or invalid fields)
+ *       405:
+ *         description: Method not allowed
+ *       500:
+ *         description: Internal server error
+ */
 export const POST = async (
   req: NextRequest,
   { params }: { params: { id: string } }
