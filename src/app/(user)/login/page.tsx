@@ -47,12 +47,16 @@ const Login = () => {
         console.log(decoded.id);
 
         localStorage.setItem("userId", decoded.id.toString());
-
+        localStorage.setItem("isAdmin", decoded.isAdmin.toString());
         window.dispatchEvent(new Event("storage"));
 
         toast.success("Login successful");
         setTimeout(() => {
-          router.push("/offers");
+          if (decoded.isAdmin) {
+            router.push("/dashboard");
+          } else {
+            router.push("/offers");
+          }
         }, 1000);
       } else {
         toast.error(result.message || "Login failed");

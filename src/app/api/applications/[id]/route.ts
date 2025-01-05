@@ -61,3 +61,57 @@ export async function GET(
     );
   }
 }
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectToMongoDB();
+
+    const applicationId = params.id;
+    const body = await req.json();
+    const { status } = body;
+
+    if (!status) {
+      return NextResponse.json(
+        { message: "Status is required" },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ["Pending", "Accepted", "Rejected"];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { message: "Invalid status value" },
+        { status: 400 }
+      );
+    }
+
+    const updatedApplication = await Application.findByIdAndUpdate(
+      applicationId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedApplication) {
+      return NextResponse.json(
+        { message: "Application not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        message: "Application status updated successfully",
+        application: updatedApplication,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Server error:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
